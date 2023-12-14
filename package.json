@@ -1,0 +1,24 @@
+{
+  "name": "spidey",
+  "version": "1.0.0",
+  "description": "Patient Management System",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ahmad Abbas",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "express-validator": "^7.0.1",
+    "mongodb": "^6.2.0",
+    "mongoose": "^7.6.4",
+    "nodemon": "^3.0.1",
+    "restify": "^11.1.0",
+    "restify-errors": "^8.0.2"
+  }
+}
