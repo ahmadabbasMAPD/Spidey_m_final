@@ -1,3 +1,12 @@
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000; // Use the PORT environment variable if available
+
+app.listen(port, () => {
+ console.log(`Server is running on port ${port}`);
+});
+
+
 // Define server name, port, and host
 let SERVER_NAME = 'patient-api';
 let PORT = 5000;
