@@ -1,45 +1,79 @@
+// const express = require('express');
+// const app = express();
+// const port = process.env.PORT || 3000; // Use the PORT environment variable if available
+
+// app.listen(port, () => {
+//  console.log(`Server is running on port ${port}`);
+// });
+
+
+// //  Define server name, port, and host
+// // let SERVER_NAME = 'patient-api';
+// // let PORT = 5000;
+// // let HOST = '127.0.0.1';
+
+// // Require necessary modules
+// const mongoose = require ("mongoose");
+// const errors = require('restify-errors');
+// const restify = require('restify');
+
+// // Set up MongoDB connection string
+// const patientname = "abbasapollort";
+// const password = "Pass1234";
+// const dbname = "mapd713db";
+// let uristring = "mongodb+srv://abbasapollort:"+password+"@spideydb.c26rjkr.mongodb.net/?retryWrites=true&w=majority"
+
+// // Establish the database connection
+// mongoose.connect(uristring, {useNewUrlParser: true});
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error:'));
+// db.once('open', ()=>{
+//   // Log the successful connection
+//   console.log("!!!! Connected to db: " + uristring)
+// });
+
+// // Define the patient schema
+// const patientSchema = new mongoose.Schema({
+//   name: String,
+//   age: String,
+//   address: String,
+//   gender: String,
+//   phno: String,
+//   tests: [
+//     {
+//       bloodPressure: String,
+//       heartRate: String,
+//       respiratoryRate: String,
+//       oxygenSaturation: String,
+//       bodyTemperature: String,
+//     },
+//   ],
+// });
+
+
 const express = require('express');
-const app = express();
-const port = process.env.PORT || 3000; // Use the PORT environment variable if available
-
-app.listen(port, () => {
- console.log(`Server is running on port ${port}`);
-});
-
-
-//  Define server name, port, and host
-// let SERVER_NAME = 'patient-api';
-// let PORT = 5000;
-// let HOST = '127.0.0.1';
-
-// Require necessary modules
-const mongoose = require ("mongoose");
-const errors = require('restify-errors');
-const restify = require('restify');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 // Set up MongoDB connection string
-const patientname = "abbasapollort";
-const password = "Pass1234";
-const dbname = "mapd713db";
-let uristring = "mongodb+srv://abbasapollort:"+password+"@spideydb.c26rjkr.mongodb.net/?retryWrites=true&w=majority"
+const uristring = "mongodb+srv://abbasapollort:Pass1234@spideydb.c26rjkr.mongodb.net/?retryWrites=true&w=majority";
 
 // Establish the database connection
-mongoose.connect(uristring, {useNewUrlParser: true});
+mongoose.connect(uristring, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', ()=>{
-  // Log the successful connection
-  console.log("!!!! Connected to db: " + uristring)
+db.once('open', () => {
+ console.log("!!!! Connected to db: " + uristring);
 });
 
 // Define the patient schema
 const patientSchema = new mongoose.Schema({
-  name: String,
-  age: String,
-  address: String,
-  gender: String,
-  phno: String,
-  tests: [
+ name: String,
+ age: String,
+ address: String,
+ gender: String,
+ phno: String,
+ tests: [
     {
       bloodPressure: String,
       heartRate: String,
@@ -47,30 +81,35 @@ const patientSchema = new mongoose.Schema({
       oxygenSaturation: String,
       bodyTemperature: String,
     },
-  ],
+ ],
 });
 
 // Create the patient model
 let PatientsModel = mongoose.model('Patients', patientSchema);
 
-// Create the Restify server
-let server = restify.createServer({ name: SERVER_NAME });
+// // Create the Restify server
+// let server = restify.createServer({ name: SERVER_NAME });
+
+// Create the Express app
+const app = express();
+app.use(bodyParser.json());
+
 
 // Start the server and log available resources
-server.listen(PORT, HOST, function () {
-  console.log(`Server ${server.name} listening at ${server.url}`);
+app.listen(PORT, HOST, function () {
+  console.log(`Server ${app.name} listening at ${app.url}`);
   console.log('**** Resources: ****');
   console.log('********************');
   console.log(' /Patients');
   console.log(' /Patients/:id');
 });
 
-// Configure server plugins
-server.use(restify.plugins.fullResponse());
-server.use(restify.plugins.bodyParser());
+// Configure app plugins
+app.use(restify.plugins.fullResponse());
+app.use(restify.plugins.bodyParser());
 
 // Create a new patient
-server.post('/Patients', function (req, res, next) {
+app.post('/Patients', function (req, res, next) {
   // Log request details
   console.log('POST /Patients params=>' + JSON.stringify(req.params));
   console.log('POST /Patients body=>' + JSON.stringify(req.body));
@@ -116,7 +155,7 @@ server.post('/Patients', function (req, res, next) {
 });
 
 // Retrieve all patients
-server.get('/Patients', function (req, res, next) {
+app.get('/Patients', function (req, res, next) {
   console.log('GET /Patients params=>' + JSON.stringify(req.params));
 
   // Retrieve all patients from the database
@@ -138,7 +177,7 @@ server.get('/Patients', function (req, res, next) {
 });
 
 // Retrieve a single patient by ID
-server.get('/Patients/:id', function (req, res, next) {
+app.get('/Patients/:id', function (req, res, next) {
   console.log('GET /Patients/:id params=>' + JSON.stringify(req.params));
 
   // Find a single patient by their id in the database
@@ -159,7 +198,7 @@ server.get('/Patients/:id', function (req, res, next) {
 });
 
 // Delete a patient by ID
-server.del('/Patients/:id', function (req, res, next) {
+app.del('/Patients/:id', function (req, res, next) {
   console.log('POST /Patients params=>' + JSON.stringify(req.params));
   // Delete the patient from the database
   PatientsModel.findOneAndDelete({ _id: req.params.id })
@@ -180,7 +219,7 @@ server.del('/Patients/:id', function (req, res, next) {
 
 
 // Delete all patients
-server.del('/Patients', function (req, res, next) {
+app.del('/Patients', function (req, res, next) {
   console.log('POST /Patients params=>' + JSON.stringify(req.params));
   // Delete all patients from the database
   PatientsModel.deleteMany({})
@@ -190,7 +229,7 @@ server.del('/Patients', function (req, res, next) {
         res.send(200, {
           message: 'All patients have been deleted from the database',
           deletedPatients: deletedPatients
-        }); // Send a detailed message to both the client and the server
+        }); // Send a detailed message to both the client and the app
       } else {
         res.send(404, 'No patients found to delete');
       }
@@ -204,7 +243,7 @@ server.del('/Patients', function (req, res, next) {
 
 
 // Add tests for a patient
-server.post('/Patients/:id/tests', function (req, res, next) {
+app.post('/Patients/:id/tests', function (req, res, next) {
   // Log request details
   console.log('POST /Patients/:id/tests params=>' + JSON.stringify(req.params));
   console.log('POST /Patients/:id/tests body=>' + JSON.stringify(req.body));
@@ -282,7 +321,7 @@ server.post('/Patients/:id/tests', function (req, res, next) {
 
 
 // Retrieve all patients in critical condition
-server.get('/Patients/critical', function (req, res, next) {
+app.get('/Patients/critical', function (req, res, next) {
   console.log('GET /Patients/critical');
 
   // Retrieve all patients from the database
@@ -333,7 +372,7 @@ server.get('/Patients/critical', function (req, res, next) {
 });
 
 // Update patient information
-server.put('/Patients/:id', function (req, res, next) {
+app.put('/Patients/:id', function (req, res, next) {
   console.log('PUT /Patients/:id params=>' + JSON.stringify(req.params));
   console.log('PUT /Patients/:id body=>' + JSON.stringify(req.body));
 
@@ -354,7 +393,7 @@ server.put('/Patients/:id', function (req, res, next) {
 });
 
 // Update the tests of a specific patient
-server.put('/Patients/:id/tests', function (req, res, next) {
+app.put('/Patients/:id/tests', function (req, res, next) {
   console.log('PUT /Patients/:id/tests params=>' + JSON.stringify(req.params));
   console.log('PUT /Patients/:id/tests body=>' + JSON.stringify(req.body));
 
@@ -387,7 +426,7 @@ server.put('/Patients/:id/tests', function (req, res, next) {
 
 
 // Delete a specific test for a patient
-server.del('/Patients/:id/tests/:testId', function (req, res, next) {
+app.del('/Patients/:id/tests/:testId', function (req, res, next) {
   console.log('DELETE /Patients/:id/tests/:testId params=>' + JSON.stringify(req.params));
 
   const { id, testId } = req.params;
@@ -424,4 +463,11 @@ server.del('/Patients/:id/tests/:testId', function (req, res, next) {
       console.log('Error: ' + error);
       return next(new errors.InternalServerError(error.message));
     });
+});
+
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+ console.log(`Server is running on port ${port}`);
 });
