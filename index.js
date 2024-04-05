@@ -7,10 +7,10 @@ app.listen(port, () => {
 });
 
 
-// Define server name, port, and host
-let SERVER_NAME = 'patient-api';
-let PORT = 5000;
-let HOST = '127.0.0.1';
+//  Define server name, port, and host
+// let SERVER_NAME = 'patient-api';
+// let PORT = 5000;
+// let HOST = '127.0.0.1';
 
 // Require necessary modules
 const mongoose = require ("mongoose");
