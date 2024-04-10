@@ -96,13 +96,13 @@ app.use(bodyParser.json());
 
 
 // Start the server and log available resources
-app.listen(PORT, HOST, function () {
-  console.log(`Server ${app.name} listening at ${app.url}`);
-  console.log('**** Resources: ****');
-  console.log('********************');
-  console.log(' /Patients');
-  console.log(' /Patients/:id');
-});
+//app.listen(PORT, HOST, function () {
+//   console.log(`Server ${app.name} listening at ${app.url}`);
+//   console.log('**** Resources: ****');
+//   console.log('********************');
+//   console.log(' /Patients');
+//   console.log(' /Patients/:id');
+// });
 
 // Configure app plugins
 app.use(restify.plugins.fullResponse());
