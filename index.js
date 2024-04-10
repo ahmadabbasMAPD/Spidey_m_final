@@ -1,165 +1,131 @@
-// const express = require('express');
-// const app = express();
-// const port = process.env.PORT || 3000; // Use the PORT environment variable if available
+// Define server name, port, and host
+let SERVER_NAME = 'patient-api';
+let PORT = 5000;
+let HOST = '127.0.0.1';
 
-// app.listen(port, () => {
-//  console.log(`Server is running on port ${port}`);
-// });
-
-
-// //  Define server name, port, and host
-// // let SERVER_NAME = 'patient-api';
-// // let PORT = 5000;
-// // let HOST = '127.0.0.1';
-
-// // Require necessary modules
-// const mongoose = require ("mongoose");
-// const errors = require('restify-errors');
-// const restify = require('restify');
-
-// // Set up MongoDB connection string
-// const patientname = "abbasapollort";
-// const password = "Pass1234";
-// const dbname = "mapd713db";
-// let uristring = "mongodb+srv://abbasapollort:"+password+"@spideydb.c26rjkr.mongodb.net/?retryWrites=true&w=majority"
-
-// // Establish the database connection
-// mongoose.connect(uristring, {useNewUrlParser: true});
-// const db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'connection error:'));
-// db.once('open', ()=>{
-//   // Log the successful connection
-//   console.log("!!!! Connected to db: " + uristring)
-// });
-
-// // Define the patient schema
-// const patientSchema = new mongoose.Schema({
-//   name: String,
-//   age: String,
-//   address: String,
-//   gender: String,
-//   phno: String,
-//   tests: [
-//     {
-//       bloodPressure: String,
-//       heartRate: String,
-//       respiratoryRate: String,
-//       oxygenSaturation: String,
-//       bodyTemperature: String,
-//     },
-//   ],
-// });
-
-
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+// Require necessary modules
+const mongoose = require("mongoose");
+const errors = require('restify-errors');
+const restify = require('restify');
 
 // Set up MongoDB connection string
-const uristring = "mongodb+srv://abbasapollort:Pass1234@spideydb.c26rjkr.mongodb.net/?retryWrites=true&w=majority";
+const patientname = "abbasapollort";
+const password = "Pass1234";
+const dbname = "mapd713db";
+let uristring = "mongodb+srv://abbasapollort:"+password+"@spideydb.c26rjkr.mongodb.net/?retryWrites=true&w=majority"
 
 // Establish the database connection
-mongoose.connect(uristring, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(uristring, {useNewUrlParser: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
- console.log("!!!! Connected to db: " + uristring);
+db.once('open', ()=>{
+ // Log the successful connection
+ console.log("!!!! Connected to db: " + uristring)
 });
 
 // Define the patient schema
+// Define the patient schema
 const patientSchema = new mongoose.Schema({
- name: String,
- age: String,
- address: String,
- gender: String,
- phno: String,
- tests: [
-    {
-      bloodPressure: String,
-      heartRate: String,
-      respiratoryRate: String,
-      oxygenSaturation: String,
-      bodyTemperature: String,
-    },
- ],
-});
+  name: String,
+  age: String,
+  address: String,
+  gender: String,
+  phno: String,
+  tests: [
+     {
+       date: Date, // Add this line to include the date of the test
+       bloodPressure: String,
+       heartRate: String,
+       respiratoryRate: String,
+       oxygenSaturation: String,
+       bodyTemperature: String,
+     },
+  ],
+ });
+ 
 
 // Create the patient model
 let PatientsModel = mongoose.model('Patients', patientSchema);
 
-// // Create the Restify server
-// let server = restify.createServer({ name: SERVER_NAME });
-
-// Create the Express app
-const app = express();
-app.use(bodyParser.json());
-
+// Create the Restify server
+let server = restify.createServer({ name: SERVER_NAME });
 
 // Start the server and log available resources
-//app.listen(PORT, HOST, function () {
-//   console.log(`Server ${app.name} listening at ${app.url}`);
-//   console.log('**** Resources: ****');
-//   console.log('********************');
-//   console.log(' /Patients');
-//   console.log(' /Patients/:id');
-// });
+server.listen(PORT, HOST, function () {
+ console.log(`Server ${server.name} listening at ${server.url}`);
+ console.log('**** Resources: ****');
+ console.log('********************');
+ console.log(' /Patients');
+ console.log(' /Patients/:id');
+});
 
-// Configure app plugins
-app.use(restify.plugins.fullResponse());
-app.use(restify.plugins.bodyParser());
+// Configure server plugins
+server.use(restify.plugins.fullResponse());
+server.use(restify.plugins.bodyParser());
+
 
 // Create a new patient
-app.post('/Patients', function (req, res, next) {
+server.post('/Patients', function (req, res, next) {
   // Log request details
   console.log('POST /Patients params=>' + JSON.stringify(req.params));
   console.log('POST /Patients body=>' + JSON.stringify(req.body));
-
+ 
   // Validate mandatory fields
   if (req.body.name === undefined) {
-    return next(new errors.BadRequestError('Name Must Be Provided'));
+     return next(new errors.BadRequestError('Name Must Be Provided'));
   }
   if (req.body.age === undefined) {
-    return next(new errors.BadRequestError('Age Must Be Provided'));
+     return next(new errors.BadRequestError('Age Must Be Provided'));
   }
   if (req.body.address === undefined) {
-    return next(new errors.BadRequestError('Address Must Be Provided'));
+     return next(new errors.BadRequestError('Address Must Be Provided'));
   }
   if (req.body.gender === undefined) {
-    return next(new errors.BadRequestError('Gender Must Be Provided'));
+     return next(new errors.BadRequestError('Gender Must Be Provided'));
   }
   if (req.body.phno === undefined) {
-    return next(new errors.BadRequestError('Phone Number Must Be Provided'));
+     return next(new errors.BadRequestError('Phone Number Must Be Provided'));
   }
+  if (req.body.tests === undefined) {
+      return next(new errors.BadRequestError('Tests Must Be Provided'));
+    }
+  if (req.body.date.length === 0) {
+      return next(new errors.BadRequestError('Date Must Be Provided'));
+    }
 
+ 
   // Create a new patient instance
   let newPatient = new PatientsModel({
-    name: req.body.name,
-    address: req.body.address,
-    age: req.body.age,
-    gender: req.body.gender,
-    phno: req.body.phno,
+     date: req.body.date, // Include the date of the test from the request body
+     name: req.body.name, // Include the name from the request body
+     address: req.body.address,
+     age: req.body.age,
+     gender: req.body.gender,
+     phno: req.body.phno,
+     tests: req.body.tests, // Include the tests array from the request body
   });
-
+ 
   // Save the new patient to the database
   newPatient
-    .save()
-    .then((patient) => {
-      console.log('saved patient: ' + patient);
-      res.send(201, patient);
-      return next();
-    })
-    .catch((error) => {
-      console.log('error: ' + error);
-      return next(new Error(JSON.stringify(error.errors)));
-    });
-});
+     .save()
+     .then((patient) => {
+       console.log('saved patient: ' + patient);
+       res.send(201, patient);
+       return next();
+     })
+     .catch((error) => {
+       console.log('error: ' + error);
+       return next(new Error(JSON.stringify(error.errors)));
+     });
+ });
+ 
 
 // Retrieve all patients
-app.get('/Patients', function (req, res, next) {
-  console.log('GET /Patients params=>' + JSON.stringify(req.params));
+server.get('/Patients', function (req, res, next) {
+ console.log('GET /Patients params=>' + JSON.stringify(req.params));
 
-  // Retrieve all patients from the database
-  PatientsModel.find({})
+ // Retrieve all patients from the database
+ PatientsModel.find({})
     .then((patients) => {
       // Include test data for each patient
       let patientsWithTests = patients.map((patient) => {
@@ -177,11 +143,11 @@ app.get('/Patients', function (req, res, next) {
 });
 
 // Retrieve a single patient by ID
-app.get('/Patients/:id', function (req, res, next) {
-  console.log('GET /Patients/:id params=>' + JSON.stringify(req.params));
+server.get('/Patients/:id', function (req, res, next) {
+ console.log('GET /Patients/:id params=>' + JSON.stringify(req.params));
 
-  // Find a single patient by their id in the database
-  PatientsModel.findOne({ _id: req.params.id })
+ // Find a single patient by their id in the database
+ PatientsModel.findOne({ _id: req.params.id })
     .then((patient) => {
       console.log('found patient: ' + patient);
       if (patient) {
@@ -198,10 +164,10 @@ app.get('/Patients/:id', function (req, res, next) {
 });
 
 // Delete a patient by ID
-app.del('/Patients/:id', function (req, res, next) {
-  console.log('POST /Patients params=>' + JSON.stringify(req.params));
-  // Delete the patient from the database
-  PatientsModel.findOneAndDelete({ _id: req.params.id })
+server.del('/Patients/:id', function (req, res, next) {
+ console.log('DELETE /Patients/:id params=>' + JSON.stringify(req.params));
+ // Delete the patient from the database
+ PatientsModel.findOneAndDelete({ _id: req.params.id })
     .then((deletedPatient) => {
       console.log('deleted patient: ' + deletedPatient);
       if (deletedPatient) {
@@ -213,23 +179,22 @@ app.del('/Patients/:id', function (req, res, next) {
     })
     .catch((error) => {
       console.log('error: ' + error);
-      return next(new Error(JSON.stringify(error.errors)));
+      return next(new errors.InternalServerError(JSON.stringify(error.errors)));
     });
 });
 
-
 // Delete all patients
-app.del('/Patients', function (req, res, next) {
-  console.log('POST /Patients params=>' + JSON.stringify(req.params));
-  // Delete all patients from the database
-  PatientsModel.deleteMany({})
+server.del('/Patients', function (req, res, next) {
+ console.log('DELETE /Patients params=>' + JSON.stringify(req.params));
+ // Delete all patients from the database
+ PatientsModel.deleteMany({})
     .then((deletedPatients) => {
       console.log('Deleted patients: ' + deletedPatients);
       if (deletedPatients.deletedCount > 0) {
         res.send(200, {
           message: 'All patients have been deleted from the database',
           deletedPatients: deletedPatients
-        }); // Send a detailed message to both the client and the app
+        }); // Send a detailed message to both the client and the server
       } else {
         res.send(404, 'No patients found to delete');
       }
@@ -241,20 +206,19 @@ app.del('/Patients', function (req, res, next) {
     });
 });
 
-
 // Add tests for a patient
-app.post('/Patients/:id/tests', function (req, res, next) {
-  // Log request details
-  console.log('POST /Patients/:id/tests params=>' + JSON.stringify(req.params));
-  console.log('POST /Patients/:id/tests body=>' + JSON.stringify(req.body));
+server.post('/Patients/:id/tests', function (req, res, next) {
+ // Log request details
+ console.log('POST /Patients/:id/tests params=>' + JSON.stringify(req.params));
+ console.log('POST /Patients/:id/tests body=>' + JSON.stringify(req.body));
 
-  // Validate the presence of all test data fields
-  if (!req.body.bloodPressure || !req.body.heartRate || !req.body.respiratoryRate || !req.body.oxygenSaturation || !req.body.bodyTemperature) {
+ // Validate the presence of all test data fields
+ if (!req.body.bloodPressure || !req.body.heartRate || !req.body.respiratoryRate || !req.body.oxygenSaturation || !req.body.bodyTemperature) {
     return next(new errors.BadRequestError('All test data fields are required'));
-  }
+ }
 
-  // Find the patient by ID
-  PatientsModel.findById(req.params.id)
+ // Find the patient by ID
+ PatientsModel.findById(req.params.id)
     .then((patient) => {
       if (!patient) {
         return next(new errors.NotFoundError('Patient not found'));
@@ -262,6 +226,7 @@ app.post('/Patients/:id/tests', function (req, res, next) {
 
       // Create a new test object
       const newTest = {
+        date: new Date(req.body.date), 
         bloodPressure: req.body.bloodPressure,
         heartRate: req.body.heartRate,
         respiratoryRate: req.body.respiratoryRate,
@@ -289,6 +254,7 @@ app.post('/Patients/:id/tests', function (req, res, next) {
         newTest.respiratoryRate < criticalConditions.respiratoryRate.min ||
         newTest.respiratoryRate > criticalConditions.respiratoryRate.max ||
         newTest.oxygenSaturation < criticalConditions.oxygenSaturation.min ||
+        newTest.oxygenSaturation < criticalConditions.oxygenSaturation.min ||
         newTest.oxygenSaturation > criticalConditions.oxygenSaturation.max ||
         newTest.bodyTemperature < criticalConditions.bodyTemperature.min ||
         newTest.bodyTemperature > criticalConditions.bodyTemperature.max
@@ -314,70 +280,67 @@ app.post('/Patients/:id/tests', function (req, res, next) {
       return next();
     })
     .catch((error) => {
-      console.log('Error: ' + error);
-      return next(new errors.InternalServerError(error.message));
+      console.error('Error adding tests:', error);
+      // Ensure a response is sent back to the client in case of an error
+      res.send(500, { error: 'Failed to add tests', message: error.message });
+      return next();
     });
 });
 
-
-// Retrieve all patients in critical condition
-app.get('/Patients/critical', function (req, res, next) {
+server.get('/Patients/critical', function (req, res, next) {
   console.log('GET /Patients/critical');
-
+ 
   // Retrieve all patients from the database
   PatientsModel.find({})
-    .then((patients) => {
-      // Check if any patients are in critical condition based on test results
-      const criticalPatients = patients.filter((patient) => {
-        if (patient.tests.length > 0) {
-          const latestTest = patient.tests[patient.tests.length - 1];
-          const criticalConditions = {
-            bloodPressure: { min: 70, max: 120 },
-            heartRate: { min: 40, max: 100 },
-            respiratoryRate: { min: 12, max: 20 },
-            oxygenSaturation: { min: 95, max: 100 },
-            bodyTemperature: { min: 97, max: 99 },
-          };
-
-          // Check for critical condition based on the latest test results
-          return (
-            latestTest.bloodPressure < criticalConditions.bloodPressure.min ||
-            latestTest.bloodPressure > criticalConditions.bloodPressure.max ||
-            latestTest.heartRate < criticalConditions.heartRate.min ||
-            latestTest.heartRate > criticalConditions.heartRate.max ||
-            latestTest.respiratoryRate < criticalConditions.respiratoryRate.min ||
-            latestTest.respiratoryRate > criticalConditions.respiratoryRate.max ||
-            latestTest.oxygenSaturation < criticalConditions.oxygenSaturation.min ||
-            latestTest.oxygenSaturation > criticalConditions.oxygenSaturation.max ||
-            latestTest.bodyTemperature < criticalConditions.bodyTemperature.min ||
-            latestTest.bodyTemperature > criticalConditions.bodyTemperature.max
-          );
-        } else {
-          return false;
-        }
-      });
-
-      // Return critical patients if any are found
-      if (criticalPatients.length > 0) {
-        res.send(criticalPatients);
-      } else {
-        res.send(404, 'No patients in critical condition');
-      }
-      return next();
-    })
-    .catch((error) => {
-      console.log('Error: ' + error);
-      return next(new errors.InternalServerError('Error retrieving critical patients'));
-    });
-});
+     .then((patients) => {
+       const criticalPatients = patients.filter((patient) => {
+         if (patient.tests.length > 0) {
+           const latestTest = patient.tests[patient.tests.length - 1];
+           const criticalConditions = {
+             bloodPressure: { min: 70, max: 120 },
+             heartRate: { min: 40, max: 100 },
+             respiratoryRate: { min: 12, max: 20 },
+             oxygenSaturation: { min: 95, max: 100 },
+             bodyTemperature: { min: 97, max: 99 },
+           };
+ 
+           return (
+             latestTest.bloodPressure < criticalConditions.bloodPressure.min ||
+             latestTest.bloodPressure > criticalConditions.bloodPressure.max ||
+             latestTest.heartRate < criticalConditions.heartRate.min ||
+             latestTest.heartRate > criticalConditions.heartRate.max ||
+             latestTest.respiratoryRate < criticalConditions.respiratoryRate.min ||
+             latestTest.respiratoryRate > criticalConditions.respiratoryRate.max ||
+             latestTest.oxygenSaturation < criticalConditions.oxygenSaturation.min ||
+             latestTest.oxygenSaturation > criticalConditions.oxygenSaturation.max ||
+             latestTest.bodyTemperature < criticalConditions.bodyTemperature.min ||
+             latestTest.bodyTemperature > criticalConditions.bodyTemperature.max
+           );
+         }
+         return false;
+       });
+ 
+       if (criticalPatients.length > 0) {
+         res.send(criticalPatients);
+       } else {
+         res.send(404, 'No patients in critical condition');
+       }
+       return next();
+     })
+     .catch((error) => {
+       console.error('Error retrieving critical patients:', error);
+       return next(new errors.InternalServerError('Error retrieving critical patients'));
+     });
+ });
+ 
 
 // Update patient information
-app.put('/Patients/:id', function (req, res, next) {
-  console.log('PUT /Patients/:id params=>' + JSON.stringify(req.params));
-  console.log('PUT /Patients/:id body=>' + JSON.stringify(req.body));
+server.put('/Patients/:id', function (req, res, next) {
+ console.log('PUT /Patients/:id params=>' + JSON.stringify(req.params));
+ console.log('PUT /Patients/:id body=>' + JSON.stringify(req.body));
 
-  // Find the patient by ID and update the information
-  PatientsModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
+ // Find the patient by ID and update the information
+ PatientsModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((updatedPatient) => {
       if (!updatedPatient) {
         return next(new errors.NotFoundError('Patient not found'));
@@ -393,12 +356,12 @@ app.put('/Patients/:id', function (req, res, next) {
 });
 
 // Update the tests of a specific patient
-app.put('/Patients/:id/tests', function (req, res, next) {
-  console.log('PUT /Patients/:id/tests params=>' + JSON.stringify(req.params));
-  console.log('PUT /Patients/:id/tests body=>' + JSON.stringify(req.body));
+server.put('/Patients/:id/tests', function (req, res, next) {
+ console.log('PUT /Patients/:id/tests params=>' + JSON.stringify(req.params));
+ console.log('PUT /Patients/:id/tests body=>' + JSON.stringify(req.body));
 
-  // Find the patient by ID and update the tests
-  PatientsModel.findById(req.params.id)
+ // Find the patient by ID and update the tests
+ PatientsModel.findById(req.params.id)
     .then((patient) => {
       if (!patient) {
         return next(new errors.NotFoundError('Patient not found'));
@@ -424,15 +387,14 @@ app.put('/Patients/:id/tests', function (req, res, next) {
     });
 });
 
-
 // Delete a specific test for a patient
-app.del('/Patients/:id/tests/:testId', function (req, res, next) {
-  console.log('DELETE /Patients/:id/tests/:testId params=>' + JSON.stringify(req.params));
+server.del('/Patients/:id/tests/:testId', function (req, res, next) {
+ console.log('DELETE /Patients/:id/tests/:testId params=>' + JSON.stringify(req.params));
 
-  const { id, testId } = req.params;
+ const { id, testId } = req.params;
 
-  // Find the patient by ID
-  PatientsModel.findById(id)
+ // Find the patient by ID
+ PatientsModel.findById(id)
     .then((patient) => {
       if (!patient) {
         return next(new errors.NotFoundError('Patient not found'));
@@ -463,11 +425,4 @@ app.del('/Patients/:id/tests/:testId', function (req, res, next) {
       console.log('Error: ' + error);
       return next(new errors.InternalServerError(error.message));
     });
-});
-
-
-// Start the server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
- console.log(`Server is running on port ${port}`);
 });
